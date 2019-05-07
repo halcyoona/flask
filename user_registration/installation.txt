@@ -1,0 +1,3 @@
+pip3 install flask-mysqldb
+pip3 install Flask-WTF
+pip3 install passlib
