@@ -44,42 +44,72 @@ db = SQLAlchemy(app)
 # index
 @app.route("/")
 def index():
-	return render_template("home.html") 
+	return render_template("index.html") 
 
 
 #about
-@app.route('/about')
-def about():
-	return render_template('about.html')
+@app.route('/help')
+def help():
+	return render_template('help.html')
+
+
+# Signin User form
+class SigninUser(Form):
+    username = StringField("",[validators.Length(min=4, max=50)])
+
+
+@app.route('/index')
+def signin():
+	form = RegisterForm(request.form)
+	if request.method == 'POST' and form.validate():
+		username = form.username.data
+		search = User.query.filter_by(username=username).first()
+		if search == "":
+			flash("User not exist","danger")
+		else:
+			redirect(url_for("index1"))
+	return render_template('index.html')
+
+
+# Signin Password form
+class SigninPass(Form):
+    password = StringField("",[validators.Length(min=4, max=50)])
+
+@app.route('/index1')
+def signin1():
+	form = RegisterForm(request.form)
+	if request.method == 'POST' and form.validate():
+		password = form.password.data
+	return render_template('index1.html')
 
 
 
 # registeration form
 class RegisterForm(Form):
-    fname = StringField('First Name', [validators.Length(min=1, max=50)])
-    lname  = StringField('Last Name', [validators.Length(min=4, max=25)])
-    phone = StringField('Phone', [validators.Length(min=6, max=20)])
-    dob = DateField('Date of Birth')
-    email = StringField('Email', [validators.Length(min=6, max=50)])
-    password = PasswordField('Password', [validators.DataRequired(), validators.EqualTo('confirm', message='Password do not match')])
-    confirm=PasswordField('Confirm Password')
+    fname = StringField("",[validators.Length(min=1, max=50)])
+    lname  = StringField('', [validators.Length(min=4, max=25)])
+    phone = StringField('', [validators.Length(min=6, max=20)])
+    dob = DateField('')
+    username = StringField('', [validators.Length(min=6, max=50)])
+    password = PasswordField('', [validators.DataRequired(), validators.EqualTo('confirm', message='Password do not match'), validators.Length(min=6)])
+    confirm=PasswordField('')
 
 
 
 
 # user register
-@app.route('/register', methods=['GET', 'POST'])
-def register():
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
 	form = RegisterForm(request.form)
 	if request.method == 'POST' and form.validate():
 		fname = form.fname.data
 		lname = form.lname.data
 		phone = form.phone.data
 		dob = form.dob.data
-		email = form.email.data
+		username = form.username.data
 		password = sha256_crypt.encrypt(str(form.password.data))
 
-		obj = User(fname, lname, password, dob, phone, email)
+		obj = User(fname, lname, password, dob, phone, username)
 		#Create cursor
 		db.session.add(obj)
 		db.session.commit()
@@ -89,46 +119,10 @@ def register():
 		return redirect(url_for("index"))	
 
 
-	return render_template('register.html', form=form)
-
-
-# Product Class/Model
-# class Product(db.Model):
-# 	"""docstring for Product"""
-# 	__tablename__="product"
-# 	id = Column(Integer, primary_key=True)
-# 	name = Column(String(100), unique=True)
-# 	description = Column(String(200))
-# 	price = Column(Integer)
-# 	qty = Column(Integer)
-
-# 	def __init__(self, name, description, price, qty):
-# 		self.name = name
-# 		self.description = description
-# 		self.price = price
-# 		self.qty = qty
+	return render_template('signup.html', form=form)
 
 
 
-
-
-
-
-
-
-
-
-# # Product Schema
-# class ProductSchema(ma.Schema):
-# 	class Meta:
-# 		fields = ("id", "name", "description", "price", "qty")
-
-
-
-
-# #Init Schema
-# product_schema = ProductSchema(strict=True)
-# products_schema = ProductSchema(many=True, strict=True)
 
 
 
