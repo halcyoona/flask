@@ -57,7 +57,7 @@ class User(Base):
 	__tablename__ = 'users'
 	fname = Column(String(50), nullable=False)
 	lname = Column(String(50), nullable=False)
-	password = Column(String(50), nullable=False)
+	password = Column(String(100), nullable=False)
 	dob = Column(DateTime, nullable=False)
 	phone = Column(String(20), nullable=False)
 	email = Column(String(50), primary_key=True, nullable=False)
@@ -78,13 +78,15 @@ class Email(Base):
 	"""docstring for Email"""
 	__tablename__ = 'emails'
 	email_id = Column(Integer, autoincrement=1, primary_key=True)
-	msg = Column(String(500))
+	subject = Column(String(100))
+	msg = Column(String(1000))
 	receiver_email = Column(String(50))
 	sender_email = Column(String(50), nullable=False)
 	time = Column(DateTime(), default=datetime.now, nullable=False)
 
-	def __init__(self, email_id, msg, receiver_email, sender_email, time ):
+	def __init__(self, email_id, subject, msg, receiver_email, sender_email, time ):
 		self.email_id = email_id
+		self.subject = subject
 		self.msg = msg
 		self.receiver_email = receiver_email
 		self.sender_email = sender_email
